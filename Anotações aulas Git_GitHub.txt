@@ -1,0 +1,376 @@
+## Navegação via command line interface e instalação
+
+### Comandos básicos para um bom desempenho no terminal
+
+
+Command line interface - CLI
+
+Graphic User interface - GUI
+
+Git = CLI
+
+
+**Windows**
+
+**dir** - lista de diretórios
+
+**cd** (change direction) - navegar entre as pastas - com a / vou para trás no C: ou cd e o nome do local - cd .. volta um local para trás
+
+**cls** - limpa tela
+
+Para auto completar: "tab" Exemplo cd W (se estiver no C) e tab irá auto completar para cd Windows
+
+**mkdir “nome da pasta”** - criar uma pasta
+
+**echo** - printa no terminal uma frase escrita
+
+**echo “texto”** > redirecionador de fluxo (pega a saída do output echo e coloca em um arquivo) e “nome do arquivo com extensão” para criá-lo
+
+**echo hello > hello.txt**
+
+**echo “texto” > arquivo.txt**
+
+Se já existir um arquivo com o mesmo nome irá informar o erro, se não irá salvar o arquivo
+
+del Workspace - confirmação S/N 
+
+**del “pasta/repositório”** - deleta tudo o que dentro dela, mas não a própria pasta
+
+Obs.: com a seta para cima vou volta os comandos já utilizados
+
+**rmdir (remove directory) “nome do diretório” /S /Q** 
+
+Não informou o por que das flags /S e /Q.  Mas sem o /S /Q informa que a pasta não está vazia e não remove
+
+
+**Linux**
+
+**ls** - lista de diretórios
+
+**cd** - igual ao Windows
+
+**clear** - limpa tela ou **ctrl+l**
+
+**sudo su** - para acessar a parte administrativa com uma senha
+
+**mkdir “nome da pasta”**- igual ao Windows
+
+**echo “texto” > arquivo.txt -** igual ao Windows
+
+**rm -rf  “nome do diretório”** (recursive force - recursive para apagar todo o conteúdo incluindo pastas e force para não perguntar se quero mesmo deletar)
+
+
+### Realizando a instalação do GIT
+
+[git-scm.com](http://git-scm.com)
+
+
+## Entendendo como o Git funciona por baixo dos panos
+
+### Tópicos fundamentais para entender o funcionamento do Git
+
+Se quiser abrir direto na pasta o git bash, vá até a pasta e clique em “Git Bash Here”.
+
+Comando para gerar o sha1 de um arquivo.
+
+openssl sha1 “nomearquivo.ext”.
+
+No exemplo: 
+
+openssl sha1 texto.txt
+
+da39a3ee5e6b4b0d3255bfef95601890afd80709
+
+Se eu inserir dados no arquivo e der o mesmo comando gera uma nova sequencia de caracteres. Cada alteração gera um SHA1 novo
+
+Inseri o primeiro SHA1 no arquivo e salvei
+
+Comando novamente
+
+f677212164e17aa4c93222f3a382989c1c24a7fa
+
+
+### Objetos Internos do Git
+
+Primeiro - SHA do conteúdo, da string
+
+Segundo - A mesma coisa sem usar o git - só que gera um outro SHA
+
+Blob (neste exemplo) contém metadados - tipo do objeto, tamanho da string,  \0 e o conteúdo
+
+No exemplo abaixo fez a mesma coisa do anterior só que no segundo caso incluiu os mesmos metadados - blob 9\0conteudo
+
+Dessa forma irá gerar exatamente o mesmo SHA
+
+O SHA do Git  faz a encriptação mas contém também metadados.
+
+Tree - armazenam blobs
+
+O nome do arquivo fica guardado na tree
+
+Monta toda a estrutura dos arquivos
+
+As trees podem apontas tanto para blobs quanto para outras trees
+
+As trees tem um SHA1 do arquivo e tem o seu próprio SHA1 encriptados os metadados da tree
+
+Se mudar um arquivo, muda o SHA do blob eo SHA da tree
+
+parente - SHA1 do último commit
+
+Se mudar algo em um arquivo, muda o SHA do blob, da tree, das outras trees que estiverem relacionadas e por consequência ao  commit
+
+Os commits montam uma “linha do tempo”
+
+
+### Chave SSH e Token
+
+Necessário fazer uma autenticação
+
+Não só o nome e senha
+
+Precisa também fazer outros processos
+
+Forma de conexão segura e encriptada entre duas máquinas
+
+Nossa máquina local com uma máquina do Github (servidor)  
+
+Duas chaves - uma chave pública e uma chave privada
+
+Vou no github e coloco a chave pública, o Github vai conhecer a máquina e terá a assinatura de nossa máquina
+
+No Github - Settings - SSH e GPG Keys
+
+Preciso da chave para inserir no Github
+
+No Git Bash
+
+comandos
+
+ssh-keygen -t ed000009 -C "e-mail"
+
+Está na pasta Users e como tem o ponto na frente é um arquivo oculto - id_ed00000 é o nome da chave que está gerando
+
+Dar enter
+
+Inserir uma senha
+
+Ir até a pasta para ver as chaves
+
+cd /c/Users/Nome.Usuario/.ssh
+
+ls para listar os arquivos
+
+Para visualizar o conteúdo de uma dessas chaves
+
+cat id_ed00000.pub 
+
+Mostrar a chave pública
+
+Copia tudo para usar no Github
+
+No curso não tinha o campo com as opções autenthicator key ou signing key
+
+Permaneceu o authenticator
+
+Comando pwd mostra o caminho completo da minha localização no windows
+
+Necessário agora inicializar o SSH agent - entidade que irá lidar com as chaves
+
+eval $(ssh-agent -s)
+
+Agent pid 00
+
+Está startando um processo para rodar em pano de fundo - número do processo
+
+Necessário entregar a chave para o agent - a chave privada, não a pública - quando chegar uma mensagem com a chave pública, irá usar a chave privada para descriptografar a mensagem
+
+ssh-add id_ed00000
+
+Digitar a senha que especificou para esta chave
+
+Quando for clonar um repositório agora com a chave SSH configurada na máquina não será possível simplesmente copiar o link do repositório e usar o git clone para poder clonar
+
+Se pegar essa url seria como se estivesse clonando via HTTPS 
+
+Code - SSH - Copiar esse link
+
+Clone feito pelo professor na aula usando o link SSH
+
+git clone “link SSH”
+
+Na primeira vez vai perguntar se quer continuar: yes
+
+No Linux é a o mesmo processo
+
+Gera um token no Github
+
+Guarda na máquina
+
+E toda vez que for fazer um commit vai pedir o usuário e senha, mas na hora da senha usar o token de acesso pessoal
+
+Setting - Developer Settings - Personal access tokens - Generate new token
+
+Note - coloca um nome qualquer
+
+Pode configurar uma data de expiração para o token
+
+Marcar a opção repo (para o padrão do terminal vai atender)
+
+Embaixo Generate token
+
+Copiar o arquivo e salvar em algum lugar seguro do computador
+
+Tenha certeza de ter copiado pois não verá novamente 
+
+Para clonar sem ter o SSH e utilizando o token, copiar o link do HTTPS
+
+
+## Primeiros comandos com Git
+
+### Iniciando o Git e criando um commit
+
+
+Antes de criar o arquivo tem que fazer umas configurações iniciais se é a primeira vez que estiver utilizando o git
+
+**git config -- global [user.email](http://user.email) “email do usuario”**
+
+Posso setar de forma global ou apenas para um repositório (dessa forma é global)
+
+**git config —global [user.name](http://user.name) nome**
+
+
+Arquivo markdown
+
+**git add ***
+
+**git commit -m “commit inicial”**
+
+
+## Ciclo de vida dos arquivos no Git
+
+### Passo a passo no ciclo de vida
+
+
+git init - cria repositório
+
+Tracked ou Untracked
+
+Tracked
+
+Unmodified - Modified Staged
+
+Adiciona arquivo - Edita arquivo - “Stage” o arquivo - Remove o arquivo - Commit
+
+
+Remote Repository (servidor)
+
+Working Directory - Staging Area - Local Repository (ambiente de desenvolvimento)
+
+
+git status 
+
+mkdir arquivo1.md
+
+mv [arquivo1.md](http://arquivo.md) ./pasta_nova/
+
+cd pasta_nova
+
+git status
+
+Changes not staged for commit
+
+Untracked files
+
+deleted no caso do arquivo pois como não foi feito o commit o arquivo movido não está mais no seu local de origem
+
+Necessário mover para área staged
+
+gitt add [arquivo.md](http://arquivo.md) pasta_nova/
+
+git status
+
+staged
+
+git commit -m “cria pasta nova, move arquivo para pasta_nova”
+
+git status
+
+A área neste momento está limpa
+
+Novo arquivo indexador
+
+echo > README.md
+
+git status
+
+untracked
+
+Inserido conteúdo no arquivo README.md
+
+git add * (tudo)
+
+git status
+
+git commit -m “Adiciona nova arquivo”
+
+
+## Trabalhando com o GitHub
+
+Criação da conta
+
+git config —list
+
+setar mesmo nickname e email
+
+git config —global —unset [user.email](http://user.email) (ou nickname)
+
+git config —list
+
+Estará em branco (feito procedimento acima de unset para mostrar como configura, mas na instalação do git se os dados já foram passados corretamente não é necessário)
+
+git config —global — [user.email](http://user.email) (ou nickname)
+
+git config —list
+
+:q para sair da lista
+
+Obs.: Atualmente o nome não é nickname mas sim user.name
+
+
+### Criação de repositório no GitHub
+
+
+git remote add origin https://github.com/danieleeloi/repositorio.git
+
+git remote -v
+
+git push origin main (no projeto que quero enviar para o repositório remoto)
+
+Obs.: Pode pedir SSH
+
+
+### Resolvendo Conflitos
+
+
+Alterou o arquivo no GitHub
+
+git pull origin main
+
+Merge conflit (em um arquivo alterado no repositório remoto)
+
+Alterou o arquivo local com a correção
+
+git add *
+
+git commit -m “resolve conflitos”
+
+git push origin main
+
+**
+
+git clone “colar o repositório”
+
+git remote -v
+
+Mostra para aonde este respositório (o clonado) está apontado
